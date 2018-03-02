@@ -16,7 +16,7 @@ proc read_vocab*(vocab_file: string): Table[string, int] =
     return vocab_table
 
 
-proc print_kv_pairs(input_table: Table[string, int]): void =
+proc print_kv_pairs*(input_table: Table[string, int]): void =
     ## Debugging function, used to print the key-value pairs in a table.
     var i: int = 0
     for key in keys[string](input_table):
@@ -25,7 +25,7 @@ proc print_kv_pairs(input_table: Table[string, int]): void =
         inc(i)
 
 
-proc print_seq_info(input_seq: seq[string]): void =
+proc print_seq_info*(input_seq: seq[string]): void =
     ## Debugging function, used to print info about a seq
     echo("Seq is " & $input_seq.len & " elements long.")
     for i in input_seq:
