@@ -71,6 +71,31 @@ proc write_ngram_counts*(filename: string, ngram_counts: Table[string, int]): vo
     out_file.close()
 
 
+proc tokenize_str(input_str: string): seq[string] =
+    ## Converts a string into a seq[string], by splitting on whitespace
+    var tokens: seq[string] = newSeq[string]()
+    for token in split(input_str):
+        tokens.add(token)
+    return tokens
+
+
+proc process_file*(filename: string, n: int): Table[string, int] =
+    ## Takes a file an returns an ngram count table
+    var ngram_counts: Table[string, int] = initTable[string, int]()
+    for line in lines filename:
+        var
+            count: int
+            tokens: seq[string] = tokenize_str(line)
+            ngram_list: seq[string] = generate_ngrams(n, tokens)
+        for ngram in ngram_list:
+            if hasKey(ngram_counts, ngram):
+                count = ngram_counts[ngram] + 1
+            else:
+                count = 1
+            `[]=`(ngram_counts, ngram, count)
+    return ngram_counts
+
+
 proc handle_args(): void =
     ## Handle the args passed in on the commandline
     # TODO: Write this functionality, adding optparse to nimble
@@ -83,5 +108,6 @@ when isMainModule:
         handle_args()
         let input_filename: string = "input_file.txt"
         # read in input_filename
-        echo(input_filename)
+        var ngram_counts: Table[string, int] = process_file(input_filename, 2)
+        write_ngram_counts("output_filename.txt", ngram_counts)
     main()
