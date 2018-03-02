@@ -23,3 +23,7 @@ task clean, "Cleans up the directory":
   exec "rm -f test/test_nimgram"
   exec "rm -f bin/nimgram"
   exec "rm -f ngram_counts.*grams"
+
+task generate_docs, "Generate documentation":
+  exec "nim doc src/nimgram.nim"
+  exec "mv src/nimgram.html doc"
