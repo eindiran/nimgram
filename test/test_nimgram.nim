@@ -7,7 +7,7 @@ import strutils
 
 proc test_build_vocab(): void =
     ## Demonstrate that we can read in a vocab file
-    var vocab_table: Table[string, int] = read_vocab("input_file.txt")
+    var vocab_table: Table[string, int] = read_vocab("test/input_file.txt")
     print_kv_pairs(vocab_table)
 
 
