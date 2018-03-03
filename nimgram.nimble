@@ -27,3 +27,7 @@ task clean, "Cleans up the directory":
 task generate_docs, "Generate documentation":
   exec "nim doc src/nimgram.nim"
   exec "mv src/nimgram.html doc"
+
+task profile, "Build the profiler friendly version":
+  exec "nim c --profiler:on --stacktrace:on --debugger:native src/nimgram.nim"
+  exec "mv src/nimgram bin"
