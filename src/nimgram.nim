@@ -3,6 +3,7 @@
 
 import tables
 import strutils
+import nimprof
 
 proc read_vocab*(vocab_file: string): Table[string, int] =
     ## Generate a vocab table using the vocabulary file as input.
