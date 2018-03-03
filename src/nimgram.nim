@@ -3,6 +3,7 @@
 
 import tables
 import strutils
+import unicode
 
 proc read_vocab*(vocab_file: string): Table[string, int] =
     ## Generate a vocab table using the vocabulary file as input.
@@ -32,18 +33,6 @@ proc print_seq_info*(input_seq: seq[string]): void =
         echo(i)
 
 
-proc get_seq_slice*(lower_bound: int, upper_bound: int, s: seq[string]): seq[string] =
-    ## Take as input two seq indices and a seq and return a slice.
-    var return_slice: seq[string] = newSeq[string]()
-    # This should work like the Python: seq[lower_bound:upper_bound]
-    for i in lower_bound..upper_bound-1:
-        try:
-            return_slice.add(s[i])
-        except IndexError:
-            break
-    return return_slice
-
-
 proc generate_ngrams*(n: int, tokens: seq[string]): seq[string] =
     ## Generate the list of ngrams from the tokens.
     var tokens_mut: seq[string] = tokens # Get a mutable copy
@@ -56,7 +45,7 @@ proc generate_ngrams*(n: int, tokens: seq[string]): seq[string] =
         var low_bound: int = i + n
         var high_bound: int = min(low_bound, num_tokens) + 1
         for j in low_bound..high_bound-1:
-            var tokens_slice: seq[string] = get_seq_slice(i, j, tokens_mut)
+            var tokens_slice: seq[string] = tokens_mut[i .. j-1]
             let current_ngram: string = join(tokens_slice, sep=" ")
             ngram_list.add(current_ngram)
     return ngram_list
@@ -71,6 +60,11 @@ proc write_ngram_counts*(filename: string, ngram_counts: Table[string, int]): vo
     out_file.close()
 
 
+proc clean_punctuation*(input_str: string): string =
+    ## Remove all standard ASCII punctuation from a string
+    return split(input_str, {'!'..'@', '['..'`', ':'..'?', '{'..'~'}).join("")
+
+
 proc tokenize_str(input_str: string): seq[string] =
     ## Converts a string into a seq[string], by splitting on whitespace.
     var tokens: seq[string] = newSeq[string]()
@@ -81,11 +75,24 @@ proc tokenize_str(input_str: string): seq[string] =
 
 proc process_file*(filename: string, n: int): Table[string, int] =
     ## Takes a file an returns an ngram count table.
-    var ngram_counts: Table[string, int] = initTable[string, int]()
+    var
+        ngram_counts: Table[string, int] = initTable[string, int]()
+        clean_punct: bool = true
+        case_normalize: bool = true
+        line_mut: string
+        tokens: seq[string]
     for line in lines filename:
+        # TODO: Clean this mess up
+        if clean_punct:
+            line_mut = clean_punctuation(line)
+        else:
+            line_mut = line
+        if case_normalize:
+            tokens = tokenize_str(unicode.toLower(line_mut))
+        else:
+            tokens = tokenize_str(line_mut)
         var
             count: int
-            tokens: seq[string] = tokenize_str(line)
             ngram_list: seq[string] = generate_ngrams(n, tokens)
         for ngram in ngram_list:
             if hasKey(ngram_counts, ngram):

@@ -25,5 +25,6 @@ task clean, "Cleans up the directory":
   exec "rm -f ngram_counts.*grams"
 
 task generate_docs, "Generate documentation":
+  exec "mkdir -p doc"
   exec "nim doc src/nimgram.nim"
   exec "mv src/nimgram.html doc"
